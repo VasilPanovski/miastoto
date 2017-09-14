@@ -1,0 +1,208 @@
+
+<div class="container-fluid" th:object="${place}" xmlns:th="http://www.thymeleaf.org">
+    <div class="row featurette">
+        <div class="col-md-7 push-md-5">
+            <h2 class="featurette-heading" th:text="*{name}"></h2>
+            <div>
+                <p class="lead" th:text="*{description}"></p>
+                <br>
+                <button id="edit-button" style="font-size:36px;color: blue"><i class="fa fa-edit"></i></button>
+            </div>
+        </div>
+        <!--<div class="col-md-7 push-md-5">-->
+            <!--<textarea id="edit-description" class="form-control" rows="3" hidden></textarea>-->
+        <!--</div>-->
+        <div class="col-md-5 pull-md-7">
+            <img id="mainImg" class="picture"
+                 th:src="@{*{mainImage}}"
+                 alt="Главна снимка"/>
+            <button style="font-size:30px;color:red;"><i class="fa fa-trash-o"></i></button>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-lg-4" th:each="image, iter : *{images}">
+            <img class="picture"
+                 th:src="@{${image}}"
+                 alt="Допълнителна снимка"/>
+            <br>
+            <button style="font-size:24px;color: blue"><i class="fa fa-edit"></i></button>
+            <button style="font-size:24px;color:red;"><i class="fa fa-trash-o"></i></button>
+        </div>
+    </div>
+    <hr>
+    <div class="btn btn-group">
+        <span>Оцени мястото:&nbsp;</span>
+        <button id="btn-like" class="btnGlyphicon"><i class="fa fa-thumbs-up" style="font-size:24px;color: green"></i></button>
+        <button id="btn-unlike" class="btnGlyphicon"><i class="fa fa-thumbs-down" style="font-size:24px;color: red"></i></button>
+    </div>
+    <div id="calendar" th:text="'Качено: ' + *{uploadDate}">
+        Качено:&nbsp; <i class="fa fa-calendar" style="font-size:18px;color: blue; alignment: right"></i>
+        12/05/20017
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <button id="btnGlyphicon" style="color: blue">Напиши коментар &nbsp;<i class="fa fa-comment"></i></button>
+            <form th:action="@{/places/place/comment/add}" id="comment-form">
+                <textarea id="comment-text" class="form-control" rows="3"></textarea>
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <input class="btn-success" type="submit" value="Изпрати">
+                    </div>
+                </div>
+            </form>
+
+            <div class="commentData" th:each="comment, iter : *{comments}">
+                <div class="commentBox" th:text="${comment.content}"></div>
+                <small th:text="${comment.user} + ' ' + ${comment.date}"></small>
+            </div>
+        </div>
+
+        <div class="col-md-6 offset-4" style="position: absolute; top: 900px">
+            <div id="map-canvas"></div>
+        </div>
+    </div>
+    <div id="commentDate" style="margin-bottom: 120px">
+
+    </div>
+    <div class="row" style="margin-bottom: 120px"></div>
+
+    <div id="myModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="img-wrapper">
+        <div id="caption-text"></div>
+    </div>
+</div>
+
+<script th:src="@{/js/place.js}"></script>
+<script th:src="@{/jquery/jquery.min.js}"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDsP-OEcnl9pVkA4uhDOh_FS2y7m92K8Us&libraries=places"
+        type="text/javascript"></script>
+
+<script th:inline="javascript">
+
+    let latitude = [[${place.location.latitude}]];
+    let longitude = [[${place.location.longitude}]];
+    let title = [[${place.name}]];
+    var map = new google.maps.Map(document.getElementById("map-canvas"), {
+        center: {
+            lat: latitude,
+            lng: longitude
+        },
+        zoom: 13
+    });
+
+    var marker = new google.maps.Marker({
+        position: {
+            lat: latitude,
+            lng: longitude
+        },
+        map:map,
+        title: title
+    });
+
+    $('#map-canvas').width(700).height(300);
+
+    function addCommentOnPage(comment) {
+        $('#comment-form').after('<div>' + comment + '</div>');
+
+        let d = new Date();
+        let month = d.getMonth()+1;
+        let day = d.getDate();
+        let output = day + '/' +
+            ((''+month).length<2 ? '0' : '') + month + '/' +
+            ((''+day).length<2 ? '0' : '') + d.getFullYear();
+
+        $('#comment-form').after('<div>' + output + '</div>');
+        $('#comment-form').hide();
+    }
+
+    var placeId = [[${place.id}]];
+
+    $('#comment-form').on('submit', function (e) {
+        let commentBindingModel = {};
+        commentBindingModel.placeId = placeId;
+        let currentComment = $('#comment-text').val();
+        commentBindingModel.comment = currentComment;
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'PUT',
+            data: JSON.stringify(commentBindingModel),
+            contentType: "application/json",
+            success: function() {
+                addCommentOnPage(currentComment);
+            }
+        });
+
+        e.preventDefault();
+    });
+
+    function markLike() {
+        $('#btn-like').append('<span>&nbsp;OK<span>').attr('disabled','disabled');
+
+    }
+    
+    function markUnlike() {
+        $('#btn-unlike').append('<span>&nbsp;OK<span>').attr('disabled','disabled');
+    }
+
+    $('#btn-like').on('click', function () {
+        let likeBindingModel = {};
+        let currentLikes = [[${place.likes}]];
+        let likes = currentLikes + 1;
+        likeBindingModel.likes = likes;
+        likeBindingModel.placeId = placeId;
+
+        $.ajax({
+            type: 'PUT',
+            url: '/places/place/likes',
+            data: JSON.stringify(likeBindingModel),
+            contentType: 'application/json',
+            success: function() {
+                markLike();
+            }
+        })
+
+    });
+
+    $('#btn-unlike').on('click', function () {
+        let likeBindingModel = {};
+        let currentLikes = [[${place.likes}]];
+        let likes = currentLikes - 1;
+        likeBindingModel.likes = likes;
+        likeBindingModel.placeId = placeId;
+
+        $.ajax({
+            type: 'PUT',
+            url: '/places/place/likes',
+            data: JSON.stringify(likeBindingModel),
+            contentType: 'application/json',
+            success: function() {
+                markUnlike();
+            }
+        })
+
+    });
+
+    $('#edit-button').on('click', function () {
+
+
+        let descriptionBindingModel = {};
+        let description = [[${place.description}]];
+        likeBindingModel.likes = likes;
+        likeBindingModel.placeId = placeId;
+
+        $.ajax({
+            type: 'PUT',
+            url: '/places/place/likes',
+            data: JSON.stringify(likeBindingModel),
+            contentType: 'application/json',
+            success: function() {
+                markUnlike();
+            }
+        })
+
+    });
+
+</script>

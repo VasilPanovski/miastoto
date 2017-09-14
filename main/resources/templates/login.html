@@ -1,0 +1,42 @@
+<div class="container" style="margin-top: 100px">
+    <h1 class="text-center">Вход за потребители</h1>
+    <br/>
+    <div class="col-sm-8 offset-2" th:if="${error} != null">
+    <h4 class="alert alert-danger alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <strong th:text="${error}"></strong>
+    </h4>
+    </div>
+    <br>
+    <form method="post">
+        <div class="form-group row">
+            <label class="col-sm-2 offset-2 col-form-label">Потребителско име</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control form-control-warning" name="username"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 offset-2 col-form-label">Парола</label>
+            <div class="col-sm-4">
+                <input type="password" class="form-control form-control-warning" name="password"/>
+            </div>
+        </div>
+        <div class="form-check col-sm-4 offset-4">
+            <label class="form-check-label col-form-label">
+                <input type="checkbox" class="form-check-input" name="rememberMe"/>
+                Запомни Ме
+            </label>
+        </div>
+        <input type="submit" class="btn btn-success offset-4" value="Вход"/>
+    </form>
+
+    <div class="offset-4">
+        <form action="/connect/facebook" method="post">
+            <input type="hidden" username="scope" value="public_profile, email, publish_actions, publish_pages, manage_pages"/>
+            <button type="submit" class="btn btn-primary" style="width: 220px"><i class="fa fa-facebook"></i>
+                &nbsp;Влез с Facebook</button>
+        </form>
+    </div>
+</div>

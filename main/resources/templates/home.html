@@ -1,0 +1,28 @@
+<div th:replace="~{fragments/carousel}"></div>
+<div id="top-content" class="container marketing">
+    <hr class="featurette-divider">
+    <h3 style="color:  #2aabd2">Топ 5 най-харесвани места</h3>
+    <div class="row">
+        <div class="col-lg-4" th:each="place,iter : ${likedPlaces}">
+            <img class="rounded-circle" th:src="@{${place.mainImage}}" alt="Снимка">
+            <h2 th:text="${place.name}"></h2>
+            <p th:text="${place.description}"></p>
+            <p><a class="btn btn-secondary" th:href="@{/places/place/{id}(id=${place.id})}" role="button">Виж мястото &raquo;</a></p>
+        </div>
+    </div>
+
+    <hr class="featurette-divider">
+    <h4 style="color: #2aabd2">Последно добавени</h4>
+    <br>
+    <div class="row featurette" th:each="place,iter : ${homePlaces}">
+        <div th:class="${iter.odd} ? 'col-md-7 push-md-5' : 'col-md-7'">
+            <h2 class="featurette-heading" th:text="${place.name}"></h2>
+            <p class="lead" th:text="${place.description}"></p>
+        </div>
+        <div th:class="${iter.odd} ? 'col-md-5 pull-md-7' : 'col-md-5'">
+            <img class="featurette-image img-fluid mx-auto" th:src="@{${place.mainImage}}" alt="Снимка">
+        </div>
+    </div>
+    <hr class="featurette-divider">
+    <a href="#top-content" style="float: right">Върни се в началото</a>
+</div>

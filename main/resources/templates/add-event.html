@@ -1,0 +1,76 @@
+<head th:replace="~{fragments/head}"></head>
+<div th:replace="~{fragments/menu}"></div>
+
+<div class="container"  style="margin-top: 100px">
+    <h1 class="text-center">Регистриране на събитие</h1>
+    <br>
+    <form enctype="multipart/form-data" method="post" th:object="${eventRegistrationModel}">
+        <div class="container">
+            <div class="form-group row" th:classappend="${#fields.hasErrors('name')} ? has-warning">
+                <label class="col-sm-2 col-form-label">Име на събитието</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control form-control-warning" th:field="*{name}"/>
+                    <div class="form-control-feedback" th:each="error : ${#fields.errors('name')}" th:text="${error}">Наименованието на събитието трябва да бъде поне 3 символа</div>
+                </div>
+            </div>
+            <div class="form-group row" th:classappend="${#fields.hasErrors('latitude')} ? has-warning">
+                <label class="col-sm-2 col-form-label">Населено място</label>
+                <div class="col-sm-8">
+                    <input id="mapsearch" type="text" class="form-control form-control-warning" placeholder="Търсене..." th:field="*{address}"/>
+                    <div id="map-canvas"></div>
+
+                    <input type="hidden" username="latitude" id="lat" th:field="*{latitude}"/>
+                    <input type="hidden" username="longitude" id="lng" th:field="*{longitude}"/>
+
+                    <div class="form-control-feedback" th:if="${#fields.errors('latitude')}">Не сте избрали местонахождение.</div>
+                    <div class="form-control-feedback"><b style="font-style: italic">Забележка:</b> Ако събитието няма точен адрес можеш да прецизираш местонахождението му като ръчно преместиш маркера на желаната позиция</div>
+                </div>
+            </div>
+            <br>
+            <div class="form-group row" th:classappend="${#fields.hasErrors('description')} ? has-warning">
+                <label class="col-sm-2 col-form-label">Подробно описание</label>
+                <div class="col-sm-8">
+                    <textarea class="form-control" rows="3" th:field="*{description}"></textarea>
+                    <div class="form-control-feedback" th:each="error : ${#fields.errors('description')}" th:text="${error}">Невалидно описание.</div>
+                </div>
+            </div>
+            <div class="form-group row" th:classappend="${#fields.hasErrors('eventDate')} ? has-warning">
+                <label class="col-sm-2 col-form-label">Дата на събитието</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control form-control-warning" placeholder="дд/мм/гггг" th:field="*{eventDate}"/>
+                    <div class="form-control-feedback" th:each="error : ${#fields.errors('eventDate')}" th:text="${error}">Невалидна дата</div>
+                </div>
+            </div>
+            <div class="form-group row" th:classappend="${#fields.hasErrors('mainImage')} ? has-warning">
+                <label class="col-sm-2 col-form-label">Заглавна снимка</label>
+                <div class="col-sm-6">
+                    <label class="custom-file col-form-label">
+                        <input type="file" class="custom-file-input" id="file" username="file" placeholder="Избери файл" th:field="*{mainImage}"/>
+                        <span class="custom-file-control"></span>
+                        <div class="form-control-feedback" th:each="error : ${#fields.errors('mainImage')}" th:text="${error}"></div>
+                    </label>
+                </div>
+            </div>
+
+            <div id="images" class="form-group row">
+                <label class="col-sm-2 col-form-label">Още снимки</label>
+                <div class="col-sm-6">
+                    <label class="custom-file col-form-label">
+                        <input type="file" class="custom-file-input" id="files" username="files[]" multiple th:field="*{images}"/>
+                        <span class="custom-file-control"></span>
+                    </label>
+                </div>
+            </div>
+            <div id="submitBtn" class="form-group row">
+                <div class="col-sm-2 offset-2">
+                    <button type="submit" class="btn btn-success">Запази</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script th:src="@{/jquery/jquery.min.js}"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDsP-OEcnl9pVkA4uhDOh_FS2y7m92K8Us&libraries=places"
+        type="text/javascript"></script>
+<script th:src="@{/js/add-items.js}"></script>

@@ -1,0 +1,55 @@
+
+<section class="jumbotron text-center" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <div class="container">
+        <h1 class="jumbotron-heading">Местата по категории</h1>
+        <p class="lead text-muted">Изберете категорията, която желаете и разгледайте всичко споделено до момента. Вие също може да споделите вашето място, а може да дадете идея за нова категория.</p>
+        <p>
+        <div class="btn btn-group" style="margin-left: -30%">
+            <div class="dropdown">
+                <button class="btn btn-success dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Категория</button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="margin-top: 20px">
+                    <a class="dropdown-item" th:href="@{/categories/{category}(category=relax)}">Разходка и отдих</a>
+                    <a class="dropdown-item" th:href="@{/categories/{category}(category=nature)}">Природни забележителности</a>
+                    <a class="dropdown-item" th:href="@{/categories/{category}(category=historicaly)}">Исторически места</a>
+                    <a class="dropdown-item" th:href="@{/categories/{category}(category=sport)}">Спорт</a>
+                    <a class="dropdown-item" th:href="@{/categories/{category}(category=beach)}">Плаж</a>
+                    <a class="dropdown-item" th:href="@{/categories/{category}(category=event)}">Събитие</a>
+                    <a class="dropdown-item" th:href="@{/categories/{category}(category=organic)}">БИО/Храна</a>
+                    <a class="dropdown-item" th:href="@{/categories/{category}(category=others)}">Други</a>
+                </div>
+            </div>
+        <div class="dropdown" sec:authorize="isAuthenticated()">
+            <button class="btn btn-success dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Добави</button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="margin-top: 20px">
+                <a class="dropdown-item" th:href="@{/places/add}">Място</a>
+                <a class="dropdown-item" th:href="@{/events/add}">Събитие</a>
+            </div>
+        </div>
+        </div>
+        </p>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row">
+        <div class="card" th:each="place,iter : ${places}">
+            <img th:src="@{${place.mainImage}}" alt="Заглавна снимка"/>
+            <h4 class="card-text" th:text="${place.name}" style="width: 300px">Име на мястото</h4>
+            <div class="row card-block" style="padding-top: 0; padding-left: 0">
+                <div class="btn btn-group">
+                    <a class="btn btn-secondary" th:href="@{/places/place/{id}(id=${place.id})}" role="button">Виж мястото &raquo;</a>
+                    <a sec:authorize="hasRole('ADMIN')" class="btn btn-danger" th:href="@{/places/delete/{placeId}(placeId=${place.id})}" role="button">Изтрий</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <nav aria-label="Page navigation" th:if="!${#lists.isEmpty(places)}" style="margin-bottom: 100px">
+        <ul class="pagination">
+            <li class="page-item" th:classappend="!${places.hasPrevious()}? 'disabled'"><a class="page-link" href="#" th:href="${places.hasPrevious()} ? '/places?page=' + ${places.previousPageable().getPageNumber()}" >Предишна</a></li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, places.getTotalPages() - 1)}">
+                <a class="page-link" href="#" th:href="|/places?page=${i}|" th:text="${i + 1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="!${places.hasNext()}? 'disabled'"><a class="page-link" href="#" th:href="${places.hasNext()} ? '/places?page=' + ${places.nextPageable().getPageNumber()}">Следваща</a></li>
+        </ul>
+    </nav>
+</div>

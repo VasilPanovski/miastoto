@@ -1,0 +1,15 @@
+img {
+    width: 350px;
+    height: 250px;
+}
+
+.btn {
+    width: 140px;
+    height: 40px;
+    margin-right: 5px;
+}
+
+.card {
+    padding-top: 0;
+    padding-bottom: 0;
+}
